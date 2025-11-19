@@ -5,6 +5,7 @@ import AdminUsersTab from '../components/AdminUsersTab'
 import AdminProjectsTab from '../components/AdminProjectsTab'
 import AdminTasksTab from '../components/AdminTasksTab'
 import AdminLogsTab from '../components/AdminLogsTab'
+import CalendarView from '../components/CalendarView'
 
 type TabType = 'dashboard' | 'users' | 'projects' | 'tasks' | 'logs'
 
@@ -14,6 +15,8 @@ interface AdminStats {
   total_tasks: number
   recent_users: any[]
   recent_projects: any[]
+  tasks_completed_today?: number
+  tasks_due_today?: number
 }
 
 export default function AdminDashboard() {
@@ -117,6 +120,7 @@ export default function AdminDashboard() {
           ) : (
             <>
               {activeTab === 'dashboard' && stats && (
+                <>
                 <div>
                   <div className="grid grid-cols-4 gap-4 mb-8">
                     <StatCard
@@ -142,6 +146,18 @@ export default function AdminDashboard() {
                       value={stats.recent_users.filter(u => u.is_admin).length}
                       icon={<FiUsers size={24} />}
                       color="red"
+                    />
+                    <StatCard
+                      title="Completed Today"
+                      value={stats.tasks_completed_today || 0}
+                      icon={<FiCheckSquare size={24} />}
+                      color="green"
+                    />
+                    <StatCard
+                      title="Due Today"
+                      value={stats.tasks_due_today || 0}
+                      icon={<FiFileText size={24} />}
+                      color="purple"
                     />
                   </div>
 
@@ -183,6 +199,10 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+                <div className="mt-8">
+                  <CalendarView />
+                </div>
+                </>
               )}
 
               {activeTab === 'users' && <AdminUsersTab />}

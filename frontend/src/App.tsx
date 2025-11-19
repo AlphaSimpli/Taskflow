@@ -6,7 +6,6 @@ import ProjectView from './pages/ProjectView'
 import Users from './pages/Users'
 import Tasks from './pages/Tasks'
 import Settings from './pages/Settings'
-import Admin from './pages/Admin'
 import AdminDashboard from './pages/AdminDashboard'
 import EditorPageRoute from './pages/EditorPageRoute'
 import Navbar from './components/Navbar'
@@ -48,7 +47,7 @@ function App() {
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
                 <Route path="/project/:id" element={<ProjectView />} />
                 <Route path="/users" element={<Users />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/tasks" element={<Tasks />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/" element={<Navigate to="/dashboard" />} />

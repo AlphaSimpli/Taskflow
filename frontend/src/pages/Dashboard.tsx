@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getProjects, createProject } from '../services/api'
 import { motion } from 'framer-motion'
+import CalendarView from '../components/CalendarView'
 import { FiPlus, FiFolder, FiChevronRight } from 'react-icons/fi'
 
 interface Project {
@@ -77,6 +78,10 @@ const Dashboard = () => {
           <div className="text-sm text-gray-500">Pending</div>
           <div className="text-2xl font-bold text-gray-900">0</div>
         </div>
+      </div>
+
+      <div className="mb-8">
+        <CalendarView />
       </div>
 
       {loading ? (

@@ -78,6 +78,9 @@ class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
     status: TaskStatus = TaskStatus.TODO
+    due_date: Optional[datetime] = None
+    scheduled_day: Optional[datetime] = None
+    priority: Optional[str] = None
 
 
 class TaskCreate(TaskBase):
@@ -88,6 +91,9 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[TaskStatus] = None
+    due_date: Optional[datetime] = None
+    scheduled_day: Optional[datetime] = None
+    priority: Optional[str] = None
 
 
 class TaskResponse(TaskBase):
@@ -134,6 +140,8 @@ class AdminStatsResponse(BaseModel):
     total_tasks: int
     recent_users: list[UserResponse]
     recent_projects: list[ProjectResponse]
+    tasks_completed_today: int = 0
+    tasks_due_today: int = 0
 
 
 class UserSuspendRequest(BaseModel):

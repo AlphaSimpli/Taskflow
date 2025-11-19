@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from ..database import get_db
-from ..models import User, Project, Task, AdminLog
+from ..models import User, Project, Task, AdminLog, TaskStatus
 from ..schemas import UserResponse, ProjectResponse, AdminLogResponse, AdminStatsResponse
 from ..deps import get_current_user
 import json
@@ -47,13 +47,25 @@ def get_admin_stats(
     
     recent_users = db.query(User).order_by(desc(User.created_at)).limit(5).all()
     recent_projects = db.query(Project).order_by(desc(Project.created_at)).limit(5).all()
-    
+    # Additional stats: tasks completed today and tasks due today
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).date()
+    tasks_completed_today = db.query(Task).filter(
+        Task.status == TaskStatus.DONE,
+        func.date(Task.updated_at) == today
+    ).count()
+    tasks_due_today = db.query(Task).filter(
+        func.date(Task.due_date) == today
+    ).count()
+
     return {
         "total_users": total_users,
         "total_projects": total_projects,
         "total_tasks": total_tasks,
         "recent_users": recent_users,
-        "recent_projects": recent_projects
+        "recent_projects": recent_projects,
+        "tasks_completed_today": tasks_completed_today,
+        "tasks_due_today": tasks_due_today
     }
 
 
@@ -252,6 +264,22 @@ def get_project_tasks(
     
     tasks = db.query(Task).filter(Task.project_id == project_id).order_by(desc(Task.created_at)).all()
     return {"items": tasks}
+
+
+@router.get("/tasks", response_model=dict)
+def list_all_tasks(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(100, ge=1, le=1000),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """List all tasks across projects (admin only)"""
+    admin = check_admin(current_user)
+
+    query = db.query(Task)
+    total = query.count()
+    tasks = query.order_by(desc(Task.created_at)).offset((page - 1) * per_page).limit(per_page).all()
+    return {"items": tasks, "total": total, "page": page, "per_page": per_page}
 
 
 @router.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -106,6 +106,11 @@ export const getProgress = (projectId: number) => {
   return api.get(`/progress/project/${projectId}`)
 }
 
+// Admin tasks
+export const getAllAdminTasks = (params?: { page?: number; per_page?: number }) => {
+  return api.get('/admin/tasks', { params })
+}
+
 // Admin / Users (admin-only endpoints)
 export const getAllUsers = (params?: { q?: string; page?: number; per_page?: number }) => {
   return api.get('/users/', { params })

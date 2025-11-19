@@ -48,6 +48,14 @@ class Task(Base):
     title = Column(String, nullable=False)
     description = Column(String)
     status = Column(SQLEnum(TaskStatus), default=TaskStatus.TODO, nullable=False)
+    # New scheduling and priority fields
+    due_date = Column(DateTime(timezone=True), nullable=True)
+    scheduled_day = Column(DateTime(timezone=True), nullable=True)
+    class Priority(str, enum.Enum):
+        LOW = "low"
+        MEDIUM = "medium"
+        HIGH = "high"
+    priority = Column(String, default=Priority.MEDIUM.value)
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

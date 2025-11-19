@@ -32,6 +32,9 @@ def create_task(
         title=task_data.title,
         description=task_data.description,
         status=task_data.status,
+        due_date=task_data.due_date,
+        scheduled_day=task_data.scheduled_day,
+        priority=task_data.priority or 'medium',
         project_id=task_data.project_id
     )
     db.add(new_task)
