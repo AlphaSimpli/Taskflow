@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { format, getDay, parseISO, startOfWeek } from 'date-fns'
+import { enUS } from 'date-fns/locale/en-US'
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar'
-import { parseISO } from 'date-fns'
-import format from 'date-fns/format'
-import getDay from 'date-fns/getDay'
-import startOfWeek from 'date-fns/startOfWeek'
-import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import api from '../services/api'
-import { motion } from 'framer-motion'
+
 
 const locales = { 'en-US': enUS }
-const localizer = dateFnsLocalizer({ format, parse: (str, _fmt) => parseISO(str), startOfWeek, getDay, locales })
+const localizer = dateFnsLocalizer({ format, parse: (str: string, _fmt: any) => parseISO(str), startOfWeek, getDay, locales })
 
 interface TaskEvent {
   id: number
