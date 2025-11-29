@@ -19,11 +19,13 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     password: Optional[str] = None
     is_admin: Optional[bool] = None
+    role: Optional[str] = None
 
 
 class UserResponse(UserBase):
     id: int
     is_admin: bool = False
+    role: str = "user"
     is_suspended: bool = False
     created_at: datetime
     

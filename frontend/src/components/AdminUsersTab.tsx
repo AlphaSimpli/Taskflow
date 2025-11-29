@@ -15,7 +15,7 @@ export default function AdminUsersTab() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-    console.debug('AdminUsersTab mounted')
+  console.debug('AdminUsersTab mounted')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
@@ -43,8 +43,9 @@ export default function AdminUsersTab() {
 
   const handleToggleAdmin = async (userId: number, isAdmin: boolean) => {
     try {
-      const res = await api.patch(`/admin/users/${userId}/admin`, null, {
-        params: { is_admin: !isAdmin }
+      const res = await api.put(`/users/${userId}`, {
+        is_admin: !isAdmin,
+        role: !isAdmin ? 'admin' : 'user'
       })
       setUsers(users.map(u => (u.id === userId ? res.data : u)))
     } catch (err) {
@@ -55,8 +56,8 @@ export default function AdminUsersTab() {
 
   const handleSuspend = async (userId: number, isSuspended: boolean) => {
     try {
-      const res = await api.patch(`/admin/users/${userId}/suspend`, null, {
-        params: { is_suspended: !isSuspended }
+      const res = await api.put(`/users/${userId}`, {
+        is_suspended: !isSuspended
       })
       setUsers(users.map(u => (u.id === userId ? res.data : u)))
     } catch (err) {
@@ -68,7 +69,7 @@ export default function AdminUsersTab() {
   const handleDelete = async (userId: number) => {
     if (!confirm('Are you sure you want to delete this user?')) return
     try {
-      await api.delete(`/admin/users/${userId}`)
+      await api.delete(`/users/${userId}`)
       setUsers(users.filter(u => u.id !== userId))
     } catch (err) {
       alert('Failed to delete user')
@@ -126,20 +127,18 @@ export default function AdminUsersTab() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        user.is_suspended
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-green-100 text-green-700'
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.is_suspended
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-green-100 text-green-700'
+                        }`}>
                         {user.is_suspended ? 'Suspended' : 'Active'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        user.is_admin
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.is_admin
+                        ? 'bg-purple-100 text-purple-700'
+                        : 'bg-gray-100 text-gray-700'
+                        }`}>
                         {user.is_admin ? 'Admin' : 'User'}
                       </span>
                     </td>

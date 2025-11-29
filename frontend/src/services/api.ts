@@ -19,7 +19,7 @@ api.interceptors.request.use((config) => {
   try {
     // eslint-disable-next-line no-console
     console.debug('[api] Request:', config.method, config.url)
-  } catch (e) {}
+  } catch (e) { }
   return config
 })
 
@@ -31,7 +31,7 @@ api.interceptors.response.use(
     try {
       // eslint-disable-next-line no-console
       console.debug('[api] Response error:', error?.response?.status, error?.config?.url)
-    } catch (e) {}
+    } catch (e) { }
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       window.location.href = '/login'
@@ -56,6 +56,10 @@ export const register = (email: string, password: string, fullName?: string) => 
 
 export const getCurrentUser = () => {
   return api.get('/users/me')
+}
+
+export const updateCurrentUser = (data: { email?: string; full_name?: string; password?: string }) => {
+  return api.put('/users/me', data)
 }
 
 // Projects
@@ -85,9 +89,9 @@ export const getTasks = (projectId: number) => {
 }
 
 export const createTask = (projectId: number, title: string, description?: string) => {
-  return api.post('/tasks/', { 
-    project_id: projectId, 
-    title, 
+  return api.post('/tasks/', {
+    project_id: projectId,
+    title,
     description,
     status: 'todo'
   })

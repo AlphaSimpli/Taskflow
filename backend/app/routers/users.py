@@ -68,6 +68,32 @@ def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+@router.put("/me", response_model=UserResponse)
+def update_me(
+    data: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update current user profile"""
+    if data.email and data.email != current_user.email:
+        # Check if email is taken
+        existing = db.query(User).filter(User.email == data.email).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        current_user.email = data.email
+    
+    if data.full_name is not None:
+        current_user.full_name = data.full_name
+        
+    if data.password:
+        current_user.hashed_password = get_password_hash(data.password)
+        
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
 @router.get("/", response_model=UsersListResponse)
 def list_users(
     q: str | None = None,
@@ -124,6 +150,11 @@ def update_user(user_id: int, data: UserUpdate, db: Session = Depends(get_db), c
         user.hashed_password = get_password_hash(data.password)
     if data.is_admin is not None:
         user.is_admin = bool(data.is_admin)
+        user.role = "admin" if user.is_admin else "user"
+    if data.role is not None:
+        user.role = data.role
+        user.is_admin = (data.role == "admin")
+        
     db.add(user)
     db.commit()
     db.refresh(user)

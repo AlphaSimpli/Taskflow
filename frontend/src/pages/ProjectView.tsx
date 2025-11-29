@@ -18,6 +18,7 @@ interface Task {
   description?: string
   status: 'todo' | 'in_progress' | 'done'
   created_at: string
+  due_date?: string
 }
 
 const ProjectView = () => {
@@ -29,6 +30,7 @@ const ProjectView = () => {
   const [showModal, setShowModal] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [newTaskDesc, setNewTaskDesc] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -40,7 +42,7 @@ const ProjectView = () => {
     try {
       const projectRes = await getProject(parseInt(id!))
       setProject(projectRes.data)
-      
+
       const tasksRes = await getTasks(parseInt(id!))
       setTasks(tasksRes.data)
     } catch (error) {
@@ -52,20 +54,26 @@ const ProjectView = () => {
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!newTaskTitle.trim()) return
+
+    setIsCreating(true)
     try {
       await createTask(parseInt(id!), newTaskTitle, newTaskDesc)
       setNewTaskTitle('')
       setNewTaskDesc('')
       setShowModal(false)
-      fetchData()
+      await fetchData() // Ensure data is refreshed before closing loading state
     } catch (error) {
       console.error('Error creating task:', error)
+      alert('Failed to create task. Please try again.') // Simple feedback for now
+    } finally {
+      setIsCreating(false)
     }
   }
 
-  const handleUpdateTask = async (taskId: number, status: string) => {
+  const handleUpdateTask = async (taskId: number, updates: Partial<Task>) => {
     try {
-      await updateTask(taskId, { status })
+      await updateTask(taskId, updates)
       fetchData()
     } catch (error) {
       console.error('Error updating task:', error)
@@ -185,9 +193,11 @@ const ProjectView = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  disabled={isCreating}
+                  className={`flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors ${isCreating ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
-                  Create
+                  {isCreating ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </form>
