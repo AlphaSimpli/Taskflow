@@ -26,6 +26,7 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => (
 
 function AppContent() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'))
+
   const location = useLocation()
 
   useEffect(() => {
@@ -71,6 +72,7 @@ function AppContent() {
       ) : (
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/editor" element={<Navigate to="/login" />} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       )}

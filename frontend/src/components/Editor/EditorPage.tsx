@@ -1,5 +1,8 @@
+
 import React, { useEffect, useRef, useState } from 'react'
 import { useEditorStore, Block } from '../../store/editorStore'
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { v4 as uuidv4 } from 'uuid'
 import SortableItem from './SortableItem'
 import { SlashMenu } from './SlashMenu'
@@ -43,7 +46,7 @@ export default function EditorPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               draggable
-              onDragStart={e => e.dataTransfer.setData('text/plain', String(i))}
+              onDragStart={(e: any) => e.dataTransfer.setData('text/plain', String(i))}
               onDragOver={e => e.preventDefault()}
               onDrop={e => {
                 const from = Number(e.dataTransfer.getData('text/plain'))

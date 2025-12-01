@@ -1,5 +1,5 @@
 import { format, getDay, parseISO, startOfWeek } from 'date-fns'
-import { enUS } from 'date-fns/locale/en-US'
+import enUS from 'date-fns/locale/en-US'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar'
