@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getProject, getTasks, createTask, updateTask, deleteTask } from '../services/api'
 import KanbanColumn from '../components/KanbanColumn'
 import TaskItem from '../components/TaskItem'
+import CalendarView from '../components/CalendarView'
 import { motion } from 'framer-motion'
 import { FiPlus } from 'react-icons/fi'
 
@@ -19,6 +20,7 @@ interface Task {
   status: 'todo' | 'in_progress' | 'done'
   created_at: string
   due_date?: string
+  scheduled_day?: string
 }
 
 const ProjectView = () => {
@@ -30,6 +32,7 @@ const ProjectView = () => {
   const [showModal, setShowModal] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [newTaskDesc, setNewTaskDesc] = useState('')
+  const [newTaskDueDate, setNewTaskDueDate] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
   useEffect(() => {
@@ -58,9 +61,15 @@ const ProjectView = () => {
 
     setIsCreating(true)
     try {
-      await createTask(parseInt(id!), newTaskTitle, newTaskDesc)
+      await createTask(
+        parseInt(id!),
+        newTaskTitle,
+        newTaskDesc,
+        newTaskDueDate ? new Date(newTaskDueDate).toISOString() : undefined
+      )
       setNewTaskTitle('')
       setNewTaskDesc('')
+      setNewTaskDueDate('')
       setShowModal(false)
       await fetchData() // Ensure data is refreshed before closing loading state
     } catch (error) {
@@ -149,6 +158,14 @@ const ProjectView = () => {
         ))}
       </div>
 
+      <div className="mt-10">
+        <CalendarView
+          title="Project Calendar"
+          projectId={project?.id}
+          tasks={tasks}
+        />
+      </div>
+
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <motion.div
@@ -183,6 +200,18 @@ const ProjectView = () => {
                   placeholder="Task details..."
                 />
               </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Deadline (optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  value={newTaskDueDate}
+                  onChange={(e) => setNewTaskDueDate(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">Pick when this task should be finished to see it on the calendar.</p>
+              </div>
               <div className="flex gap-4">
                 <button
                   type="button"
@@ -209,4 +238,3 @@ const ProjectView = () => {
 }
 
 export default ProjectView
-

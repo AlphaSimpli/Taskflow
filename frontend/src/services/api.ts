@@ -88,16 +88,25 @@ export const getTasks = (projectId: number) => {
   return api.get(`/tasks/project/${projectId}`)
 }
 
-export const createTask = (projectId: number, title: string, description?: string) => {
+export const createTask = (
+  projectId: number,
+  title: string,
+  description?: string,
+  dueDate?: string
+) => {
   return api.post('/tasks/', {
     project_id: projectId,
     title,
     description,
+    due_date: dueDate,
     status: 'todo'
   })
 }
 
-export const updateTask = (id: number, data: { title?: string; description?: string; status?: string }) => {
+export const updateTask = (
+  id: number,
+  data: { title?: string; description?: string; status?: string; due_date?: string | null }
+) => {
   return api.put(`/tasks/${id}`, data)
 }
 
@@ -133,4 +142,3 @@ export const exportUsersCsv = () => {
 }
 
 export default api
-
