@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getProjects, createProject } from '../services/api'
+import { getProjects, createProject, deleteProject } from '../services/api'
 import { motion } from 'framer-motion'
 import CalendarView from '../components/CalendarView'
-import { FiPlus, FiFolder, FiChevronRight } from 'react-icons/fi'
+import { FiPlus, FiFolder, FiChevronRight, FiTrash2 } from 'react-icons/fi'
 
 interface Project {
   id: number
@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [showModal, setShowModal] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDesc, setNewProjectDesc] = useState('')
+  const [deletingId, setDeletingId] = useState<number | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -45,6 +46,20 @@ const Dashboard = () => {
       fetchProjects()
     } catch (error) {
       console.error('Error creating project:', error)
+    }
+  }
+
+  const handleDeleteProject = async (projectId: number) => {
+    if (!confirm('Delete this project and all its tasks?')) return
+    try {
+      setDeletingId(projectId)
+      await deleteProject(projectId)
+      setProjects((prev) => prev.filter((p) => p.id !== projectId))
+    } catch (error) {
+      console.error('Error deleting project:', error)
+      alert('Failed to delete project. Please try again.')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -113,12 +128,27 @@ const Dashboard = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.06 }}
-                onClick={() => navigate(`/project/${project.id}`)}
-                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 cursor-pointer border border-gray-100 hover:border-primary-200"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100 hover:border-primary-200"
               >
                 <div className="flex items-start justify-between mb-4">
                   <FiFolder className="w-8 h-8 text-primary-600" />
-                  <FiChevronRight className="w-5 h-5 text-gray-400" />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => navigate(`/project/${project.id}`)}
+                      className="p-2 text-gray-500 hover:text-primary-600 transition-colors"
+                      title="Open project"
+                    >
+                      <FiChevronRight className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProject(project.id)}
+                      disabled={deletingId === project.id}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                      title="Delete project"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{project.name}</h3>
                 {project.description && (
@@ -206,4 +236,3 @@ const Dashboard = () => {
 }
 
 export default Dashboard
-
