@@ -1,12 +1,13 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "postgresql://taskflow:taskflow123@postgres:5432/taskflow"
+    DATABASE_URL: str
     
     # JWT
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
@@ -18,9 +19,14 @@ class Settings(BaseSettings):
     # Admin - designate an admin email for admin-only endpoints (optional)
     ADMIN_EMAIL: str | None = None
     
+    @field_validator("CORS_ORIGINS", mode="before")
+    def split_cors_origins(cls, value):
+        if isinstance(value, str):
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
+
     class Config:
         env_file = ".env"
 
 
 settings = Settings()
-

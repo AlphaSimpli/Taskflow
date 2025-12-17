@@ -2,11 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from .config import settings
-from .database import engine, Base
 from .routers import users, projects, tasks, progress, admin
-
-# Create database tables
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="TaskFlow API", version="1.0.0")
 
