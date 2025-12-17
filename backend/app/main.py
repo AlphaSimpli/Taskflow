@@ -13,8 +13,8 @@ app = FastAPI(title="TaskFlow API", version="1.0.0")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    # Allow both localhost and 127.0.0.1 for local dev (some browsers use one or the other)
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://frontend:5173"],
+    # Allow configured origins (comma-separated via env) so Render frontend URLs can be added without code changes
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,4 +36,3 @@ def root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
-
