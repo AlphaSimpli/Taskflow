@@ -1,4 +1,4 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export type BlockType = 'paragraph' | 'heading' | 'todo'
@@ -20,8 +20,8 @@ type EditorState = {
   setBlocks: (blocks: Block[]) => void
 }
 
-export const useEditorStore = create<EditorState>(
-  persist(
+export const useEditorStore = create<EditorState>()(
+  persist<EditorState>(
     (set, get) => ({
       blocks: [
         { id: 'b1', type: 'heading', content: 'Untitled Document' },
@@ -38,12 +38,13 @@ export const useEditorStore = create<EditorState>(
       updateBlock: (id, patch) =>
         set(state => ({ blocks: state.blocks.map(b => (b.id === id ? { ...b, ...patch } : b)) })),
       removeBlock: id => set(state => ({ blocks: state.blocks.filter(b => b.id !== id) })),
-      moveBlock: (from, to) => set(state => {
-        const blocks = [...state.blocks]
-        const [moved] = blocks.splice(from, 1)
-        blocks.splice(to, 0, moved)
-        return { blocks }
-      }),
+      moveBlock: (from, to) =>
+        set(state => {
+          const blocks = [...state.blocks]
+          const [moved] = blocks.splice(from, 1)
+          blocks.splice(to, 0, moved)
+          return { blocks }
+        }),
       setBlocks: blocks => set({ blocks })
     }),
     {

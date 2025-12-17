@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { getAllUsers, updateUser, deleteUser } from '../services/api'
 import { FiEdit, FiTrash2 } from 'react-icons/fi'
@@ -30,7 +31,7 @@ const Admin = () => {
       setError(null)
     } catch (err) {
       console.error('Error fetching users', err)
-      if (err?.response?.status === 403) setError('Admin access required. Set ADMIN_EMAIL on the backend or login as the admin.')
+      if (isAxiosError(err) && err.response?.status === 403) setError('Admin access required. Set ADMIN_EMAIL on the backend or login as the admin.')
       else setError('Could not fetch users')
     } finally {
       setLoading(false)
