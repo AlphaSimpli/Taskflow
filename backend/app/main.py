@@ -1,9 +1,27 @@
+import logging
+from pathlib import Path
+
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 from .config import settings
 from .routers import users, projects, tasks, progress, admin
 
+
+def run_migrations() -> None:
+    """Run Alembic migrations on startup; safe to call repeatedly."""
+    try:
+        base_path = Path(__file__).resolve().parents[1]
+        alembic_cfg = Config(str(base_path / "alembic.ini"))
+        alembic_cfg.set_main_option("script_location", str(base_path / "migrations"))
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+        command.upgrade(alembic_cfg, "head")
+    except Exception as exc:  # pragma: no cover - startup best-effort
+        logging.warning("Alembic migration skipped due to error: %s", exc)
+
+
+run_migrations()
 app = FastAPI(title="TaskFlow API", version="1.0.0")
 
 # CORS middleware
